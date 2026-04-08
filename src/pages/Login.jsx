@@ -1,15 +1,37 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
+import { end_points } from "../services/api"
 
 const Login = () => {
   const [user, setUser] = useState("")
   const [password, setPassword] = useState("")
   const [remember, setRemember] = useState(false)
+  const [users, setUsers] = useState([]) //para definir un estado para el token con un arreglo vacio que taera lo de la api
+
+  function getUsers() { //then = try catch = catch
+    fetch(end_points.users)
+    .then(function(responese){return responese.json()})
+    .then(function(data){return setUsers(data)})
+    .catch(function (error){console.log(error)}) //hace la peticion a la api con el end point de users
+  }
+
+  useEffect(() => {
+      getUsers()
+  }, []) 
+
+  console.log(users)
+
+  function findUser() {
+  let auth = users.find((item) => user == item.username && password == item.password)
+  return auth
+  }
 
   function signIn(e) {
     e.preventDefault()
     if (user === "" || password === "") return alert("Login or password is empty")
-    if (user === "admin" && password === "admin") return alert("Welcome admin")
-    if (user !== "admin" || password !== "admin") return alert("Login or password is incorrect")
+    if (findUser()) return alert("Welcome admin")
+    if (findUser() == "undefined") return alert("Login or password is incorrect")
+
   }
 
   return (
